@@ -13,7 +13,8 @@ private const val SLACK_URL = "https://slack.com/api/chat.postMessage"
 @Service
 class Slack @Autowired constructor (
     restTemplateBuilder: RestTemplateBuilder,
-    @Value("\${slack.token}") private val slackToken: String?
+    @Value("\${slack.token}") private val slackToken: String?,
+    @Value("\${slack.channel}") private val slackChannel: String?
 ) {
     private val restTemplate: RestTemplate = restTemplateBuilder.build()
 
@@ -24,10 +25,9 @@ class Slack @Autowired constructor (
             return headers
         }
 
-    fun sendMessage(channel: String, message: String) {
-
+    fun sendMessage(message: String) {
         val request: HttpEntity<SlackRequest> = HttpEntity<SlackRequest>(
-            SlackRequest(channel, message),
+            SlackRequest(slackChannel, message),
             headers
         )
 
@@ -41,6 +41,6 @@ class Slack @Autowired constructor (
 }
 
 data class SlackRequest (
-    val channel: String,
+    val channel: String?,
     val text: String
 )

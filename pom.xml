@@ -78,7 +78,24 @@
 				</includes>
 				<filtering>false</filtering>
 			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
 		</resources>
 	</build>
+
+	<!-- profiles -->
+	<profiles>
+		<profile>
+			<id>local</id>
+		</profile>
+		<profile>
+			<id>production</id>
+		</profile>
+	</profiles>
 
 </project>

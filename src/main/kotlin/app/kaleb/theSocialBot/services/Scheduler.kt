@@ -3,23 +3,76 @@ package app.kaleb.theSocialBot.services
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Service
 class Scheduler @Autowired constructor(
     var messagingService: MessagingService,
     var slack: Slack
 ) {
-    @Scheduled(fixedRate = 5000)
+    var lastSent: LocalDate? = null
+    var sendHistory: MutableList<String> = mutableListOf()
+
+    // three hours
+    @Scheduled(fixedRate = 3 * 60 * 60 * 1000)
     fun runMessageJob() {
 
-        // TODO Skip if Weekend
+        // Check that it passes a random threshold (50% chance)
+        if (Math.random() > 0.3) {
+            println("Skipping, random threshold")
+            return
+        }
 
-        // TODO Skip if not between 9-5
+        if (checkIfWeekend()) {
+            println("Skipping, weekend")
+            return
+        }
 
-        // TODO Skip if sent in the past 48 hours
+        if (checkIfOutsideWorkHours()) {
+            println("Skipping, outside work hours")
+            return
+        }
+
+        if (checkIfSentRecently()) {
+            println("Skipping, already sent in the last 2 days")
+            return
+        }
+
+        lastSent = LocalDate.now()
 
         val messages = messagingService.getMessages()
-        slack.sendMessage("general", messages.random())
+        var messageToSend: String
+
+        // Check message hasn't already been sent
+        do {
+            messageToSend = messages.random()
+        } while (sendHistory.contains(hashMessage(messageToSend)))
+
+        sendHistory.add(hashMessage(messageToSend))
+        slack.sendMessage(messageToSend)
     }
 
+    private fun hashMessage(message: String): String {
+        return message.hashCode().toString()
+    }
+
+    private fun checkIfWeekend(): Boolean {
+        val currentDate = LocalDate.now()
+        val dayOfWeek = currentDate.dayOfWeek
+        return (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY)
+    }
+
+    private fun checkIfOutsideWorkHours(): Boolean {
+        val currentTime = LocalTime.now()
+        val startTime = LocalTime.of(9, 0) // 9 AM
+        val endTime = LocalTime.of(17, 0) // 5 PM
+        return (!currentTime.isAfter(startTime) || !currentTime.isBefore(endTime))
+    }
+
+    private fun checkIfSentRecently(): Boolean {
+        val currentDate = LocalDate.now()
+        return (lastSent != null && lastSent!!.isAfter(currentDate.minusDays(2)))
+    }
 }
