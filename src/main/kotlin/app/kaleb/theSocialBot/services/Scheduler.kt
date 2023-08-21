@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class Scheduler @Autowired constructor(
-    var messagingService: MessagingService
+    var messagingService: MessagingService,
+    var slack: Slack
 ) {
     @Scheduled(fixedRate = 5000)
     fun runMessageJob() {
@@ -18,8 +19,7 @@ class Scheduler @Autowired constructor(
         // TODO Skip if sent in the past 48 hours
 
         val messages = messagingService.getMessages()
-        println("Message job running...")
-        println(messages.random())
+        slack.sendMessage("general", messages.random())
     }
 
 }
