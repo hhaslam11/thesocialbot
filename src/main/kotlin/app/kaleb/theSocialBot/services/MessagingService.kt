@@ -12,7 +12,7 @@ class MessagingService @Autowired constructor(val resourceLoader: ResourceLoader
     fun getMessages(): List<String> {
         val questions: MutableList<String> = mutableListOf()
 
-        val resource = resourceLoader.getResource("https://raw.githubusercontent.com/hhaslam11/thesocialbot/messages.txt")
+        val resource = resourceLoader.getResource("https://raw.githubusercontent.com/hhaslam11/thesocialbot/main/messages.txt")
         val inputStream = resource.inputStream
         val reader = BufferedReader(InputStreamReader(inputStream))
 
