@@ -1,21 +1,20 @@
 package app.kaleb.theSocialBot.services
 
-import org.springframework.core.io.ClassPathResource
-import org.springframework.core.io.Resource
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
-import java.io.File
-import java.io.FileReader
+import java.io.InputStreamReader
 
 @Service
-class MessagingService {
+class MessagingService @Autowired constructor(val resourceLoader: ResourceLoader) {
 
     fun getMessages(): List<String> {
         val questions: MutableList<String> = mutableListOf()
 
-        val resource: Resource = ClassPathResource("messages.txt")
-        val file: File = resource.file
-        val reader = BufferedReader(FileReader(file))
+        val resource = resourceLoader.getResource("https://raw.githubusercontent.com/hhaslam11/thesocialbot/messages.txt")
+        val inputStream = resource.inputStream
+        val reader = BufferedReader(InputStreamReader(inputStream))
 
         var line: String?
         while (reader.readLine().also { line = it } != null) {

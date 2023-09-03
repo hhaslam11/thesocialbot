@@ -19,27 +19,28 @@ class Scheduler @Autowired constructor(
     @Scheduled(fixedRate = 3 * 60 * 60 * 1000)
     fun runMessageJob() {
 
-        // Check that it passes a random threshold (50% chance)
-        if (Math.random() > 0.3) {
-            println("Skipping, random threshold")
+        // Check that it passes a random threshold. Increase number to increase frequency
+        if (Math.random() > .25) {
+            println("🟡 Skipping, random threshold")
             return
         }
 
         if (checkIfWeekend()) {
-            println("Skipping, weekend")
+            println("🟡 Skipping, weekend")
             return
         }
 
         if (checkIfOutsideWorkHours()) {
-            println("Skipping, outside work hours")
+            println("🟡 Skipping, outside work hours")
             return
         }
 
         if (checkIfSentRecently()) {
-            println("Skipping, already sent in the last 2 days")
+            println("🟡 Skipping, already sent in the last 2 days")
             return
         }
 
+        println("🟢 Passed checks, sending message")
         lastSent = LocalDate.now()
 
         val messages = messagingService.getMessages()
